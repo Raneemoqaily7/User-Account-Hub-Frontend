@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Button, Grid } from "@mui/material";
 import { AgGridReact } from 'ag-grid-react';
-import DropdownRenderer_User from "./DropDownRender_User"
-import {StatusEnum} from "./enums"
+import DropdownRenderer from "./DropdownRenderer"
+import { StatusEnum } from "./Enum"
 
 
 import axios from "axios";
@@ -16,16 +16,16 @@ import { GridApi } from "ag-grid-community";
 
 
 
-function UserView() {
-    const [status,setStatus] =useState()
+function UsersView() {
+    const [status, setStatus] = useState()
     const [users, setUsers] = useState([])
-    const [showModal, setShowModal] = useState(false)
     const [inputValue, setInputValue] = useState('')
     const [searchResult, setsearchResult] = useState(null)
-    const [selectedUsers,setSelectedUsers] =useState()
+    const [selectedUsers, setSelectedUsers] = useState()
     const [editingUser, setEditingUser] = useState(null);
-    const handleShow = () => setShowModal(true)
-   
+    const [showModal, setShowModal] = useState(false);
+    const handleClose = () => setShowModal(false);
+    const handleShow = () => setShowModal(true);
 
     const [columnDefs, setColumnDefs] = useState([
         {
@@ -66,10 +66,10 @@ function UserView() {
             cellRendererParams: {
                 values: Object.values(StatusEnum),
                 onValueChange: (newValue) => {
-                  setStatus(newValue);
+                    setStatus(newValue);
                 },
             },
-          }
+        }
 
     ]);
 
@@ -85,7 +85,7 @@ function UserView() {
     }, []);
     let gridApi;
 
-    
+
 
     const onGridReady = useCallback((params) => {
         gridApi = params.api
@@ -105,68 +105,67 @@ function UserView() {
 
     const handleEdit = () => {
         if (gridApi) {
-          const selectedNodes = gridApi.getSelectedNodes();
-          const selectedUser = selectedNodes.length === 1 ? selectedNodes[0].data : null;
-          setEditingUser(selectedUser);
+            const selectedNodes = gridApi.getSelectedNodes();
+            const selectedUser = selectedNodes.length === 1 ? selectedNodes[0].data : null;
+            setEditingUser(selectedUser);
         }
         setShowModal(true);
-      };
-      const handleClose = () => {
-        setShowModal(false);
-      };
-      const handleAddNew = () => {
+    };
+
+    const handleAddNew = () => {
         setEditingUser(null); // Set to null to indicate a new user
         setShowModal(true);
-      };
-      const handleSave = (userData) => {
+    };
+    const handleSave = (userData) => {
         if (editingUser) {
-          // If editingUser is present, it means we are editing an existing user
-          // Make an API call to update the user data
-          axios.patch(`http://127.0.0.1:8000/api/updateuser/${editingUser.id}/`, userData)
-            .then((response) => {
-              if (response.status === 200 || response.status === 204) {
-                // Successful response
-                alert('User updated successfully');
-                setShowModal(false);
-                // Fetch updated user list
-               onGridReady();
-              } else {
-                // Handle other status codes (e.g., 404, 500, etc.)
-                console.error('Failed to update user. Status code:', response.status);
-                // You might want to show an error message to the user
-                alert('Failed to update user. Please try again.');
-              }
-            })
-            .catch((error) => {
-              console.error('Error updating user:', error);
-              // You might want to show an error message to the user
-              alert('Error updating user. Please try again.');
-            });
+            // If editingUser is present, it means we are editing an existing user
+            // Make an API call to update the user data
+            axios.patch(`http://127.0.0.1:8000/api/updateuser/${editingUser.id}/`, userData)
+                .then((response) => {
+                    if (response.status === 200 || response.status === 204) {
+                        // Successful response
+                        alert('User updated successfully');
+                        setShowModal(false);
+                        // Fetch updated user list
+                        onGridReady();
+                    } else {
+                        // Handle other status codes (e.g., 404, 500, etc.)
+                        console.error('Failed to update user. Status code:', response.status);
+                        // You might want to show an error message to the user
+                        alert('Failed to update user. Please try again.');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error updating user:', error);
+                    // You might want to show an error message to the user
+                    alert('Error updating user. Please try again.');
+                });
         } else {
-          // If editingUser is null, it means we are adding a new user
-          // Make an API call to add the new user
-          axios.post('http://127.0.0.1:8000/api/adduser/', userData)
-            .then((response) => {
-              if (response.status === 200) {
-                // Successful response
-                console.log(response.data);
-                alert('User added successfully');
-                setShowModal(false);
-                // Fetch updated user list
-                 // Fetch updated user list
-                 onGridReady();
-        } else {
-          // Handle other status codes
-          console.error('Failed to add user. Status code:', response.status);
-          // You might want to show an error message to the user
-          alert('Failed to add user. Please try again.');
+            // If editingUser is null, it means we are adding a new user
+            // Make an API call to add the new user
+            axios.post('http://127.0.0.1:8000/api/adduser/', userData)
+                .then((response) => {
+                    if (response.status === 200) {
+                        // Successful response
+                        console.log(response.data);
+                        alert('User added successfully');
+                        setShowModal(false);
+                        // Fetch updated user list
+                        // Fetch updated user list
+                        onGridReady();
+                    } else {
+                        // Handle other status codes
+                        console.error('Failed to add user. Status code:', response.status);
+                        // You might want to show an error message to the user
+                        alert('Failed to add user. Please try again.');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error adding user:', error);
+                    // You might want to show an error message to the user
+                    alert('Error adding user. Please try again.');
+                });
         }
-      })
-      .catch((error) => {
-        console.error('Error adding user:', error);
-        // You might want to show an error message to the user
-        alert('Error adding user. Please try again.');
-      });  }
     };
 
     // function to search for the user by id or username or email
@@ -184,35 +183,35 @@ function UserView() {
 
     }
 
-    const onSelectionChanged =() =>{
+    const onSelectionChanged = () => {
         const selectedNodes = gridApi.getSelectedNodes()
-        const selectedaData = selectedNodes.map(node=>node.data)
+        const selectedaData = selectedNodes.map(node => node.data)
         setSelectedUsers(selectedaData)
 
     }
 
-    const gridOptions ={
+    const gridOptions = {
         rowSelection: 'multiple',
-        onSelectionChanged : onSelectionChanged
+        onSelectionChanged: onSelectionChanged
     }
 
-    const handleDelete = () =>{
-        let ids =[]
-        selectedUsers.map(user=>{
+    const handleDelete = () => {
+        let ids = []
+        selectedUsers.map(user => {
             ids.push(user.id)
         })
-        const body={
-            data:{
-                "users_id":ids
+        const body = {
+            data: {
+                "users_id": ids
             }
 
         }
         axios.delete('http://127.0.0.1:8000/api/deleteuser/', body)
-      .then(() => {
-        const result = users.filter(item => !selectedUsers.includes(item));
-        setUsers(result)
-        alert("deleted successfully!!")
-      })
+            .then(() => {
+                const result = users.filter(item => !selectedUsers.includes(item));
+                setUsers(result)
+                alert("deleted successfully!!")
+            })
     }
 
 
@@ -232,12 +231,12 @@ function UserView() {
                         onChange={(e) => setInputValue(e.target.value)}
 
                     />
-
+                    <Button onClick={searchHandler}>   Search </Button>
                 </div>
                 <Button onClick={handleDelete}>delete</Button>
-                <Button onClick={searchHandler}>   Search </Button>
+
                 <Button onClick={handleAddNew}>Add New</Button>
-        <Button onClick={handleEdit}>Edit</Button>
+                <Button onClick={handleEdit}>Edit</Button>
 
                 <div className="grid-container">
 
@@ -253,16 +252,11 @@ function UserView() {
                     )
                         :
                         <div className="ag-theme-alpine-dark" style={{ height: '500px', width: '100%' }}>
-                            <AgGridReact  rowData={users} gridOptions={gridOptions} columnDefs={columnDefs} pagination={true} paginationPageSize={10} defaultColDef={defaultColDef} onGridReady={onGridReady}  frameworkComponents={{ dropdownRenderer: DropdownRenderer_User }} />
+                            <AgGridReact rowData={users} gridOptions={gridOptions} columnDefs={columnDefs} pagination={true} paginationPageSize={10} defaultColDef={defaultColDef} onGridReady={onGridReady} frameworkComponents={{ dropdownRenderer: DropdownRenderer }} />
                         </div>
                     }
 
-<NewUser
-            showModal={showModal}
-            handleClose={handleClose}
-            handleSave={handleSave}
-            userToEdit={editingUser}
-          />
+                    <NewUser showModal={showModal} handleClose={handleClose} setUsers={setUsers} />
 
                 </div>
             </div>
@@ -270,4 +264,4 @@ function UserView() {
 
     )
 }
-export default UserView
+export default UsersView

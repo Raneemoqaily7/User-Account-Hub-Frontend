@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { StatusEnum } from './enums'; // Import the StatusEnum
+import { StatusEnum } from './Enum'; // Import the StatusEnum
 
-function DropdownRenderer_User(props) {
+function DropdownRenderer(props) {
   const { value = 0, onValueChange } = props;
   const [selectedValue, setSelectedValue] = useState(value);
   const user = props.data;
@@ -38,9 +38,10 @@ function DropdownRenderer_User(props) {
   );
 }
 
-DropdownRenderer_User.propTypes = {
+DropdownRenderer.propTypes = {
   value: PropTypes.number,
   onValueChange: PropTypes.func,
 };
 
-export default DropdownRenderer_User;
+export default  DropdownRenderer
+
