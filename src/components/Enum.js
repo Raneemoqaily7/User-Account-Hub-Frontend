@@ -6,6 +6,7 @@ export  const StatusEnum = {
   };
   
   export  const GenderEnum = {
+    default:null,
     MALE: 0,
     FEMALE: 1,
   };
